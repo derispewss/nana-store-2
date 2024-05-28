@@ -26,7 +26,7 @@ const Products = ({ data }) => {
             if (slug === '') {
                 setProducts(data);
             } else {
-                const response = await axios.get(`https://bs7g03bb-3500.asse.devtunnels.ms/api/products/filter?slug=${slug}`);
+                const response = await axios.get(`https://api.storenana.my.id/products/filter?slug=${slug}`);
                 setProducts(response.data);
             }
         } catch (error) {
@@ -46,7 +46,7 @@ const Products = ({ data }) => {
         });
         if (result.isConfirmed) {
         try {
-            await axios.post('https://bs7g03bb-3500.asse.devtunnels.ms/api/products/update-data', {
+            await axios.post('https://api.storenana.my.id/products/update-data', {
                 slug: slug,
                 newData: newData
             });
@@ -73,7 +73,7 @@ const Products = ({ data }) => {
         });
         if (result.isConfirmed) {
         try {
-            await axios.post('https://bs7g03bb-3500.asse.devtunnels.ms/api/products/delete-data', {
+            await axios.post('https://api.storenana.my.id/products/delete-data', {
                 slug: slug,
                 product_name: product_name
             });
@@ -89,7 +89,7 @@ const Products = ({ data }) => {
     const handleAddProduct = async () => {
         setLoading(true)
         try {
-            await axios.post('https://bs7g03bb-3500.asse.devtunnels.ms/api/products/add-data', {
+            await axios.post('https://api.storenana.my.id/products/add-data', {
                 slug: selectedSlug,
                 newData: {
                     product_name: newProductName,

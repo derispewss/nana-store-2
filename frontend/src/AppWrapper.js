@@ -22,7 +22,7 @@ const AppWrapper = () => {
         const fetchGameSections = async () => {
             setIsLoading(true);
             try {
-                const response = await axios.get('https://bs7g03bb-3500.asse.devtunnels.ms/api/products');
+                const response = await axios.get('https://api.storenana.my.id/products');
                 setGameSections(response.data);
             } catch (error) {
                 console.error('Error fetching game sections:', error);

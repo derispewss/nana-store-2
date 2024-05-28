@@ -27,7 +27,7 @@ const storage = multer.memoryStorage()
 const upload = multer({ storage: storage });
 
 // authentication
-app.post('/api/send-otp', async (req, res) => {
+app.post('/send-otp', async (req, res) => {
     const { email } = req.body;
     try {
         const { data: existingUser } = await db.from('otp_tokens').select('*').eq('user_login', email).single();
@@ -51,7 +51,7 @@ app.post('/api/send-otp', async (req, res) => {
     }
 });
 
-app.post('/api/validate-otp', async (req, res) => {
+app.post('/validate-otp', async (req, res) => {
     const { otp, token } = req.body;
     if (!otp || !token) return res.status(400).send("otp and token is required")
     try {
@@ -75,7 +75,7 @@ app.post('/api/validate-otp', async (req, res) => {
 // end authentication
 
 // Endpoint untuk mengunggah gambar ke Firebase Storage
-app.post('/api/upload-logo', upload.single('image'), async (req, res) => {
+app.post('/upload-logo', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).send('No file uploaded');
@@ -102,7 +102,7 @@ app.post('/api/upload-logo', upload.single('image'), async (req, res) => {
     }
 });
 
-app.post('/api/upload-banner', upload.single('image'), async (req, res) => { 
+app.post('/upload-banner', upload.single('image'), async (req, res) => { 
     try {
         if (!req.file) {
             return res.status(400).send('No file uploaded');
@@ -147,7 +147,7 @@ app.post('/api/upload-banner', upload.single('image'), async (req, res) => {
 });
 
 
-app.get('/api/get-banners', async (req, res) => {
+app.get('/get-banners', async (req, res) => {
     try {
         const bannersDoc = await firestore.collection('settings-nanastore').doc('banners').get();
         if (!bannersDoc.exists) {
@@ -167,7 +167,7 @@ app.get('/api/get-banners', async (req, res) => {
 });
 
 // products manage
-app.get('/api/products', async (req, res) => {
+app.get('/products', async (req, res) => {
     try {
         const querySnapshot = await firestore.collection('nanastore').get();
         const data = querySnapshot.docs.map(doc => {
@@ -181,7 +181,7 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-app.get('/api/products/filter', async (req, res) => {
+app.get('/products/filter', async (req, res) => {
     const { slug } = req.query;
     if (!slug) {
         return res.status(400).send('Slug query parameter is required');
@@ -202,7 +202,7 @@ app.get('/api/products/filter', async (req, res) => {
     }
 });
 
-app.get('/api/products/:id', async (req, res) => {
+app.get('/products/:id', async (req, res) => {
     try {
         const docId = req.params.id;
         const doc = await firestore.collection('nanastore').doc(docId).get();
@@ -216,7 +216,7 @@ app.get('/api/products/:id', async (req, res) => {
     }
 });
 
-app.post('/api/products/upload-data', async (req, res) => {
+app.post('/products/upload-data', async (req, res) => {
     try {
         const { name, logo, description, category, slug, redirect_owner, data, token } = req.body;
         const { data: responseToken } = await db.from('otp_tokens').select('*').eq('access_token', token).single();
@@ -254,7 +254,7 @@ app.post('/api/products/upload-data', async (req, res) => {
     }
 });
 
-app.post('/api/products/add-data', async (req, res) => {
+app.post('/products/add-data', async (req, res) => {
     try {
         const { slug, newData } = req.body;
         if (!slug || !newData) return res.status(400).send('Invalid input format');
@@ -272,7 +272,7 @@ app.post('/api/products/add-data', async (req, res) => {
     }
 });
 
-app.post('/api/products/update-data', async (req, res) => {
+app.post('/products/update-data', async (req, res) => {
     try {
         const { slug, newData } = req.body;
         if (!slug || !newData) return res.status(400).send('Invalid input format');
@@ -295,7 +295,7 @@ app.post('/api/products/update-data', async (req, res) => {
     }
 });
 
-app.post('/api/products/delete-data', async (req, res) => {
+app.post('/products/delete-data', async (req, res) => {
     try {
         const { slug, product_name } = req.body;
         if (!slug || !product_name) return res.status(400).send('Invalid input format');

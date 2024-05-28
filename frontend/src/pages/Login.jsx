@@ -33,7 +33,7 @@ const Login = () => {
         setLoading(true);
         setError('');
         try {
-            const response = await axios.post('https://bs7g03bb-3500.asse.devtunnels.ms/api/send-otp', { email: email });
+            const response = await axios.post('https://api.storenana.my.id/api/send-otp', { email: email });
             if (response.data.success) {
                 localStorage.setItem('otp_token', response.data.hashedToken);
                 localStorage.setItem('isLogin', email)
@@ -52,7 +52,7 @@ const Login = () => {
         setError('');
         try {
             const token = localStorage.getItem('otp_token');
-            const response = await axios.post('https://bs7g03bb-3500.asse.devtunnels.ms/api/validate-otp', { otp, token });
+            const response = await axios.post('https://api.storenana.my.id/validate-otp', { otp, token });
             if (response.data.success) {
                 setSuccessMessage('OTP successfully validated!');
                 localStorage.setItem('access_token', response.data.access_token);

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
-    const EndpointUrl = 'https://bs7g03bb-3500.asse.devtunnels.ms/api/products';
+    const EndpointUrl = 'https://api.storenana.my.id/products';
     const [data, setData] = useState([]);
     const [groupedData, setGroupedData] = useState({});
     

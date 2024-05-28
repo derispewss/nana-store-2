@@ -11,7 +11,7 @@ const Settings = () => {
     useEffect(() => {
         const fetchImages = async () => {
             try {
-                const response = await axios.get('https://bs7g03bb-3500.asse.devtunnels.ms/api/get-banners');
+                const response = await axios.get('https://api.storenana.my.id/get-banners');
                 setImages(response.data);
             } catch (error) {
                 console.error('Gagal mendapatkan daftar gambar:', error);
@@ -37,7 +37,7 @@ const Settings = () => {
             const formData = new FormData();
             formData.append('image', selectedImage);
 
-            const response = await axios.post('https://bs7g03bb-3500.asse.devtunnels.ms/api/upload-banner', formData, {
+            const response = await axios.post('https://api.storenana.my.id/upload-banner', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -45,7 +45,7 @@ const Settings = () => {
 
             console.log('Image uploaded successfully:', response.data);
             setSelectedImage(null);
-            const refreshedImages = await axios.get('https://bs7g03bb-3500.asse.devtunnels.ms/api/get-banners');
+            const refreshedImages = await axios.get('https://api.storenana.my.id/get-banners');
             setImages(refreshedImages.data);
         } catch (error) {
             console.error('Error uploading image:', error);

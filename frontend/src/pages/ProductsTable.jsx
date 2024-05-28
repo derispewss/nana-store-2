@@ -14,7 +14,7 @@ const ProductsTable = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get('https://bs7g03bb-3500.asse.devtunnels.ms/api/products');
+                const response = await axios.get('https://api.storenana.my.id/products');
                 setProducts(response.data);
                 const slug = response.data.map(product => product.slug);
                 setFilterOptions([...new Set(slug)]);
@@ -29,10 +29,10 @@ const ProductsTable = () => {
         const slug = event.target.value;
         setSelectedName(slug);
         if (slug === '') {
-            const response = await axios.get('https://bs7g03bb-3500.asse.devtunnels.ms/api/products');
+            const response = await axios.get('https://api.storenana.my.id/products');
             setProducts(response.data);
         } else {
-            const response = await axios.get(`https://bs7g03bb-3500.asse.devtunnels.ms/api/products/filter?slug=${slug}`);
+            const response = await axios.get(`https://api.storenana.my.id/products/filter?slug=${slug}`);
             setProducts(response.data);
         }
     };

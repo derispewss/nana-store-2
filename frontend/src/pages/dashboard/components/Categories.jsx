@@ -26,7 +26,7 @@ const Categories = () => {
     const formDataUpload = new FormData();
     formDataUpload.append('image', imageFile);
     try {
-      const response = await axios.post('https://bs7g03bb-3500.asse.devtunnels.ms/api/upload-logo', formDataUpload, {
+      const response = await axios.post('https://api.storenana.my.id/upload-logo', formDataUpload, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -58,7 +58,7 @@ const Categories = () => {
     };
 
     try {
-      const response = await axios.post('https://bs7g03bb-3500.asse.devtunnels.ms/api/products/upload-data', payload);
+      const response = await axios.post('https://api.storenana.my.id/products/upload-data', payload);
       console.log('Upload successful:', response.data);
       iziToast.success({
         title: 'Success',

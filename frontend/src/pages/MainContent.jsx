@@ -12,7 +12,7 @@ const MainContent = ({ data }) => {
     useEffect(() => {
         const fetchImages = async () => {
             try {
-                const response = await axios.get('https://bs7g03bb-3500.asse.devtunnels.ms/api/get-banners');
+                const response = await axios.get('https://api.storenana.my.id/get-banners');
                 setImages(response.data);
             } catch (error) {
                 console.error('Gagal mendapatkan daftar gambar:', error);
