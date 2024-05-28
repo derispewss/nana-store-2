@@ -45,7 +45,7 @@ return (
                         <Link to="/product" className="block text-white hover:text-orange-200">Product</Link>
                     </li>
                     <li className="py-2">
-                        <Link to="/contact" className="block text-white hover:text-orange-200">Contact</Link>
+                        <Link to="https://wa.me/6282229025162?text=kak+aku+dari+website" target='_blank' className="block text-white hover:text-orange-200">Contact</Link>
                     </li>
                     <li className="py-2">
                         <Link to="/login" className="block text-white hover:text-orange-200">{isLoggedIn() ? 'Dashboard' : 'Sign In'}</Link>
