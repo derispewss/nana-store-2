@@ -22,7 +22,7 @@ return (
                                 <Link to="/product" className="nav-link text-white hover:font-semibold">Product</Link>
                             </li>
                             <li className={`nav-item ${activeNav === 'Contact' ? 'active' : ''}`} onClick={() => setActiveNav('Contact')}>
-                                <Link to="https://wa.me/6282229025162?text=kak+aku+dari+website!" target='_blank' className="nav-link text-white hover:font-semibold">Contact</Link>
+                                <Link to="https://wa.me/6282229025162?text=kak+aku+dari+website" target='_blank' className="nav-link text-white hover:font-semibold">Contact</Link>
                             </li>
                             <li className={`nav-item ${activeNav === 'Sign In' ? 'active' : ''}`} onClick={() => setActiveNav('Sign In')}>
                                 <Link to="/login" className="nav-link text-white hover:font-semibold">{isLoggedIn() ? 'Dashboard' : 'Sign In'}</Link>
