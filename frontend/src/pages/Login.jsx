@@ -33,7 +33,7 @@ const Login = () => {
         setLoading(true);
         setError('');
         try {
-            const response = await axios.post('https://api.storenana.my.id/api/send-otp', { email: email });
+            const response = await axios.post('https://api.storenana.my.id/send-otp', { email: email });
             if (response.data.success) {
                 localStorage.setItem('otp_token', response.data.hashedToken);
                 localStorage.setItem('isLogin', email)
