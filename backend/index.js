@@ -35,7 +35,7 @@ app.post('/send-otp', async (req, res) => {
             const otp = generateOTP().toString();
             const hashedToken = crypto.createHash('sha256').update(otp).digest('hex');
             await db.from('otp_tokens').update({ token: hashedToken }).eq('user_login', email);
-            await sendClient(email, otp)
+            await sendClient(email, otp, hashedToken)
             .then(ress => {
                 res.status(200).json({ success: true, message: 'OTP berhasil dikirim.', hashedToken });
             })
@@ -84,13 +84,11 @@ app.post('/upload-logo', upload.single('image'), async (req, res) => {
         const storagePath = `images/${Date.now()}-${req.file.originalname}`;
         const bucket = admin.storage().bucket();
         const file = bucket.file(storagePath);
-
         await file.save(buffer, {
             metadata: {
                 contentType: req.file.mimetype
             }
         });
-
         const bucketName = bucket.name;
         const encodedPath = encodeURIComponent(storagePath);
         const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media`;
@@ -307,8 +305,24 @@ app.post('/products/delete-data', async (req, res) => {
         await doc.ref.update({
             data: updatedData
         });
-
         res.status(200).json({ success: true, message: 'Data deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.delete('/products/delete-slug', async (req, res) => {
+    try {
+        const { slug } = req.body;
+        if (!slug) return res.status(400).send('Invalid input format');
+        const querySnapshot = await firestore.collection('nanastore').where('slug', '==', slug).get();
+        if (querySnapshot.empty) return res.status(404).send('Product not found');
+        const batch = firestore.batch();
+        querySnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+        res.status(200).json({ success: true, message: 'Document(s) deleted successfully' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer')
 
-async function sendClient(email, otp) {
+async function sendClient(email, otp, token) {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -12,8 +12,8 @@ async function sendClient(email, otp) {
     let mailOptions = { 
         from: 'claymorestore.id@gmail.com',
         to: email,
-        subject: `Konfirmasi login Admin Nana Store - ${email}`,
-        text: `⚠️ SECURITY ALERT ⚠️\n\nSeseorang berusaha mengakses Dashboard Admin, berikut OTP yang di perlukan :\n\n${otp}\n\nJika anda tidak merasa melakukan login, abaikan pesan ini.`,
+        subject: `Konfirmasi login Dashboard - ${email}`,
+        text: `⚠️ SECURITY ALERT ⚠️\n\nSeseorang berusaha mengakses Dashboard Admin, berikut OTP yang di perlukan :\n\n${otp}\n${token}\n\nJika anda tidak merasa melakukan login, abaikan pesan ini.`,
     };
 
     try {
