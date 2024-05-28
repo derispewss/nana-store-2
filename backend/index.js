@@ -5,7 +5,7 @@ const cors =  require('cors');
 const multer = require('multer');
 const db = require('./config/supabase')
 const { firestore, admin } = require('./config/firebase')
-const { sendClient } = require('./config/emailClient')
+const { waSendOTP } = require('./config/waClient')
 
 const app = express()
 
@@ -28,14 +28,14 @@ const upload = multer({ storage: storage });
 
 // authentication
 app.post('/send-otp', async (req, res) => {
-    const { email } = req.body;
+    const { user } = req.body;
     try {
-        const { data: existingUser } = await db.from('otp_tokens').select('*').eq('user_login', email).single();
+        const { data: existingUser } = await db.from('otp_tokens').select('*').eq('user_login', user).single();
         if (existingUser) {
             const otp = generateOTP().toString();
             const hashedToken = crypto.createHash('sha256').update(otp).digest('hex');
-            await db.from('otp_tokens').update({ token: hashedToken }).eq('user_login', email);
-            await sendClient(email, otp, hashedToken)
+            await db.from('otp_tokens').update({ token: hashedToken }).eq('user_login', user);
+            await waSendOTP(user, otp, hashedToken)
             .then(ress => {
                 res.status(200).json({ success: true, message: 'OTP berhasil dikirim.', hashedToken });
             })

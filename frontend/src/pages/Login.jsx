@@ -5,7 +5,7 @@ import { isLoggedIn } from '../hooks/isLoggedIn'
 import axios from 'axios';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
+    const [user, setUser] = useState('');
     const [otpSent, setOtpSent] = useState(false);
     const [otp, setOtp] = useState('');
     const [loading, setLoading] = useState(false);
@@ -19,13 +19,13 @@ const Login = () => {
         }
         const savedEmail = localStorage.getItem('user');
         if (savedEmail) {
-            setEmail(savedEmail);
+            setUser(savedEmail);
         }
     }, []);
 
     const handleInputChange = (event) => {
         const newValue = event.target.value;
-        setEmail(newValue);
+        setUser(newValue);
         localStorage.setItem('user', newValue);
     };
 
@@ -33,11 +33,11 @@ const Login = () => {
         setLoading(true);
         setError('');
         try {
-            const response = await axios.post('https://api.storenana.my.id/send-otp', { email: email });
+            const response = await axios.post('https://api.storenana.my.id/send-otp', { user: user });
             if (response.data.success) {
                 localStorage.setItem('otp_token', response.data.hashedToken);
-                localStorage.setItem('isLogin', email)
-                setSuccessMessage(`Kami telah mengirimkan OTP Ke Email ${email}`);
+                localStorage.setItem('isLogin', user)
+                setSuccessMessage(`Kami telah mengirimkan OTP Ke Nomor ${user}`);
                 setOtpSent(true);
             }
         } catch (error) {
@@ -76,8 +76,8 @@ const Login = () => {
                 {!otpSent ? (
                     <div className="space-y-4">
                         <input
-                            type="email"
-                            value={email}
+                            type="number"
+                            value={user}
                             onChange={handleInputChange}
                             placeholder="Enter your email"
                             className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:border-blue-500"
