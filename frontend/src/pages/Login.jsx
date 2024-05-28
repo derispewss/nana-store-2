@@ -17,9 +17,9 @@ const Login = () => {
         if (isLoggedIn()) {
             window.location.href = '/dashboard';
         }
-        const savedEmail = localStorage.getItem('user');
-        if (savedEmail) {
-            setUser(savedEmail);
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+            setUser(savedUser);
         }
     }, []);
 
@@ -79,12 +79,12 @@ const Login = () => {
                             type="number"
                             value={user}
                             onChange={handleInputChange}
-                            placeholder="Enter your email"
+                            placeholder="Enter your phoneNumber"
                             className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:border-blue-500"
                         />
                         <button
                             onClick={sendOTP}
-                            disabled={loading || email.trim() === ''}
+                            disabled={loading || user.trim() === ''}
                             className="w-full px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 transition-colors duration-300 disabled:opacity-50 flex justify-center items-center">
                             {loading ? <ClipLoader color="#fff" size={24} /> : 'Login'}
                         </button>
