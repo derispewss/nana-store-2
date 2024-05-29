@@ -3,6 +3,7 @@ import axios from 'axios';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { ClipLoader } from 'react-spinners';
+import { FormatRupiah } from "@arismun/format-rupiah";
 
 const Products = ({ data }) => {
     const [products, setProducts] = useState(data);
@@ -157,7 +158,7 @@ const Products = ({ data }) => {
                                             className="border p-1 w-full"
                                         />
                                     ) : (
-                                        p.price
+                                        <FormatRupiah value={p.price} />
                                     )}
                                 </td>
                                 <td className="border px-4 py-2 text-center">

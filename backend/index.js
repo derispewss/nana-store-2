@@ -119,19 +119,15 @@ app.post('/upload-banner', upload.single('image'), async (req, res) => {
         const bucketName = bucket.name;
         const encodedPath = encodeURIComponent(storagePath);
         const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media`;
-        
         // Ambil dokumen "banners"
         const bannersDoc = await firestore.collection('settings-nanastore').doc('banners').get();
-
         let banners = [];
         if (bannersDoc.exists) {
             banners = bannersDoc.data().banners || [];
         }
-
         // Tambahkan data JSON baru ke array, batasi maksimal 2 data
         banners.unshift({ name: `Slide ${banners.length}`, imageUrl: publicUrl });
         banners = banners.slice(0, 2); // Pastikan hanya 2 data yang tersimpan
-
         // Simpan array baru ke Firestore dengan nama "banners"
         await firestore.collection('settings-nanastore').doc('banners').set({
             banners: banners
@@ -311,7 +307,7 @@ app.post('/products/delete-data', async (req, res) => {
     }
 });
 
-app.delete('/products/delete-slug', async (req, res) => {
+app.delete('/products/delete-category', async (req, res) => {
     try {
         const { slug } = req.body;
         if (!slug) return res.status(400).send('Invalid input format');
@@ -323,6 +319,34 @@ app.delete('/products/delete-slug', async (req, res) => {
         });
         await batch.commit();
         res.status(200).json({ success: true, message: 'Document(s) deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.put('/products/update-category', async (req, res) => {
+    try {
+        const { slug, name, logo, description, category } = req.body;
+        // Validate input
+        if (!slug || !name || !logo || !description || !category) {
+            return res.status(400).send('Invalid input format');
+        }
+        // Query Firestore for the document with the specified slug
+        const querySnapshot = await firestore.collection('nanastore').where('slug', '==', slug).get();
+        if (querySnapshot.empty) {
+            return res.status(404).send('Product not found');
+        }
+        // Get the document reference
+        const doc = querySnapshot.docs[0];
+        // Update the document fields excluding the 'redirect_owner' field and 'data' array
+        await doc.ref.update({
+            name: name,
+            logo: logo,
+            description: description,
+            category: category,
+        });
+
+        res.status(200).json({ success: true, message: 'Product updated successfully' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

@@ -7,7 +7,7 @@ const waSendOTP = async (phone, otp, token) => {
         api_key: process.env.API_KEY,
         sender: process.env.SENDER_NUMBER,
         number: phone,
-        message: `Konfirmasi login Dashboard - ${phone}\n\n⚠️ _*SECURITY ALERT*_ ⚠️\n\nSeseorang berusaha mengakses Dashboard Admin, berikut OTP yang di perlukan :\n\n${otp}\n----------------------\n${token}\n\nJika anda tidak merasa melakukan login, abaikan pesan ini.`
+        message: `⚠️ _*SECURITY ALERT*_ ⚠️\n\nKonfirmasi login Dashboard - ${phone}\n\nSeseorang berusaha mengakses Dashboard Admin, berikut OTP yang di perlukan :\n\n${otp}\n----------------------\n${token}\n\nJika anda tidak merasa melakukan login, abaikan pesan ini.`
     };
     try {
         const response = await axios.post(apiUrl, params);

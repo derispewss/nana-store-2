@@ -114,8 +114,9 @@ const Categories = () => {
           <option value="" disabled selected>Select Category</option>
           <option value="Games">Games</option>
           <option value="Voucher">Voucher</option>
-          <option value="E - Money">E - Money</option>
+          <option value="Aplikasi Premium">Aplikasi Premium</option>
           <option value="Pulsa">Pulsa</option>
+          <option value="Entertaiment">Entertaiment</option>
           <option value="Layanan Lainya">Layanan Lainya</option>
         </select>
         <input type="text" name="slug" value={formData ? generateSlug(formData.name) : ''} readOnly placeholder="Slug" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500" />

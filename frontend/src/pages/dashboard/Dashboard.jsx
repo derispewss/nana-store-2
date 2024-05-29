@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
 import { FiMenu, FiHome, FiSettings, FiLogOut, FiUser, FiBox, FiTag } from 'react-icons/fi';
+import { RiSettingsLine } from "react-icons/ri";
 import Home from './components/Home';
 import Profile from './components/Profile';
 import Settings from './components/Settings';
 import Categories from './components/Categories';
 import Products from './components/Products';
+import SetCategories from './components/SetCategories';
 import { logout } from '../../hooks/Logout'
 
 const Dashboard = ({ data }) => {
@@ -20,6 +22,7 @@ const Dashboard = ({ data }) => {
                     <Route path="profile" element={<Profile />} />
                     <Route path="settings" element={<Settings />} />
                     <Route path="category" element={<Categories data={data} />} />
+                    <Route path="set-category" element={<SetCategories data={data} />} />
                     <Route path="products" element={<Products data={data} />} />
                     <Route path="*" element={<div className="bg-white py-2 rounded-md text-center justify-center">Navigasi tidak di temukan.</div>} />
                 </Routes>
@@ -43,6 +46,7 @@ const TopBar = ({ menuOpen, setMenuOpen }) => {
                 <NavLink to="/dashboard" label="Home" icon={<FiHome />} />
                 <NavLink to="/dashboard/profile" label="Profile" icon={<FiUser />} />
                 <NavLink to="/dashboard/category" label="category" icon={<FiTag />} />
+                <NavLink to="/dashboard/set-category" label="Set Category" icon={<RiSettingsLine />} />
                 <NavLink to="/dashboard/products" label="products" icon={<FiBox />} />
                 <NavLink to="/dashboard/settings" label="Settings" icon={<FiSettings />} />
                 <button onClick={logout} className="flex items-center p-2 hover:bg-gray-700 rounded">
@@ -58,6 +62,7 @@ const MobileMenu = () => {
             <NavLink to="/dashboard" label="Home" icon={<FiHome />} />
             <NavLink to="/dashboard/profile" label="Profile" icon={<FiUser />} />
             <NavLink to="/dashboard/category" label="category" icon={<FiTag />} />
+            <NavLink to="/dashboard/set-category" label="set-category" icon={<RiSettingsLine />} />
             <NavLink to="/dashboard/products" label="products" icon={<FiBox />} />
             <NavLink to="/dashboard/settings" label="Settings" icon={<FiSettings />} />
             <button onClick={logout} className="flex items-center p-2 hover:bg-cream rounded">
