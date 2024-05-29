@@ -24,6 +24,9 @@ return (
                             <li className={`nav-item ${activeNav === 'Contact' ? 'active' : ''}`} onClick={() => setActiveNav('Contact')}>
                                 <Link to="https://wa.me/6282229025162?text=kak+aku+dari+website" target='_blank' className="nav-link text-white hover:font-semibold">Contact</Link>
                             </li>
+                            <li className={`nav-item ${activeNav === 'Contact' ? 'active' : ''}`} onClick={() => setActiveNav('Group')}>
+                                <Link to="https://chat.whatsapp.com/KI8HTMymv76JX2ieQN5Myu" target='_blank' className="nav-link text-white hover:font-semibold">Group</Link>
+                            </li>
                             <li className={`nav-item ${activeNav === 'Sign In' ? 'active' : ''}`} onClick={() => setActiveNav('Sign In')}>
                                 <Link to="/login" className="nav-link text-white hover:font-semibold">{isLoggedIn() ? 'Dashboard' : 'Sign In'}</Link>
                             </li>
@@ -48,6 +51,9 @@ return (
                         <Link to="https://wa.me/6282229025162?text=kak+aku+dari+website" target='_blank' className="block text-white hover:text-orange-200">Contact</Link>
                     </li>
                     <li className="py-2">
+                        <Link to="https://chat.whatsapp.com/KI8HTMymv76JX2ieQN5Myu" target='_blank' className="block text-white hover:text-orange-200">Group</Link>
+                    </li>
+                    <li className="py-2 mb-2">
                         <Link to="/login" className="block text-white hover:text-orange-200">{isLoggedIn() ? 'Dashboard' : 'Sign In'}</Link>
                     </li>
                     </ul>
