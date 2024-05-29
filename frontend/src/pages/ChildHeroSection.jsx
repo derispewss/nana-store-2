@@ -1,7 +1,7 @@
 import AlertsError from '../components/AlertsError';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FormatRupiah } from "@arismun/format-rupiah";
 
 const ChildHeroSection = ({ data }) => {
@@ -16,6 +16,7 @@ const ChildHeroSection = ({ data }) => {
     const [formOption, setFormOption] = useState('');
     const [loginVia, setLoginVia] = useState('');
     const [isViaLogin, setIsViaLogin] = useState(false);
+    const selectedItemRef = useRef(null);
 
     useEffect(() => {
         if (data.slug && data.slug.includes('via-login')) {
@@ -25,6 +26,12 @@ const ChildHeroSection = ({ data }) => {
             setFormOption('VIA ID');
         }
     }, [data.slug]);
+
+    useEffect(() => {
+        if (selectedItem) {
+            selectedItemRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [selectedItem]);
 
     if (!data) {
         return <AlertsError />;
@@ -156,32 +163,32 @@ const ChildHeroSection = ({ data }) => {
                 <div>
                     <h3 className="text-3xl font-semibold mb-6 px-4">Products</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 px-4">
-                        {data.data.map((item, index) => (
-                            <div
-                                key={index}
-                                onClick={() => item.statusProducts && setSelectedItem(item)}
-                                className={`rounded-lg shadow-lg p-6 bg-white text-gray-800 ${
-                                    item.statusProducts ? 'cursor-pointer hover:shadow-2xl transform transition-transform duration-300 hover:scale-105' : 'cursor-not-allowed opacity-50'
-                                } ${selectedItem === item ? 'ring-4 ring-white' : ''}`}>
-                                <div className="text-center font-bold mb-2">
-                                    {item.product_name}
-                                </div>
-                                <div className="text-center text-lg text-gray-700">
-                                {<FormatRupiah value={item.price}/>}
-                                </div>
-                                {!item.statusProducts && (
-                                    <div className="text-center text-red-500 mt-2">
-                                        Produk Tidak Tersedia
-                                    </div>
-                                )}
+                    {data.data.map((item, index) => (
+                        <div
+                            key={index}
+                            onClick={() => item.statusProducts && setSelectedItem(item)}
+                            className={`rounded-lg shadow-lg p-6 bg-white text-gray-800 ${
+                                item.statusProducts ? 'cursor-pointer hover:shadow-3xl transform transition-transform duration-300 hover:scale-105' : 'cursor-not-allowed opacity-50'
+                            } ${selectedItem === item ? 'ring-2 ring-cokelat' : ''}`}>
+                            <div className="text-center font-bold mb-2">
+                                {item.product_name}
                             </div>
-                        ))}
+                            <div className="text-center text-lg text-gray-700">
+                                {<FormatRupiah value={item.price}/>}
+                            </div>
+                            {!item.statusProducts && (
+                                <div className="text-center text-red-500 mt-2">
+                                    Produk Tidak Tersedia
+                                </div>
+                            )}
+                        </div>
+                    ))}
                     </div>
                 </div>
             </div>
 
             {selectedItem && (
-                <div className="container mx-auto bg-white p-6 border-t border-gray-300 shadow-lg w-full rounded-t-lg">
+                <div ref={selectedItemRef} className="container mx-auto bg-white p-6 border-t border-gray-300 shadow-lg w-full rounded-t-lg">
                     <div className="flex items-center justify-between px-4">
                         <div className="flex items-center">
                             <div className="text-gray-800">

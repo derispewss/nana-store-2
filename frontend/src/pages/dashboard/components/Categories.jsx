@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import iziToast from 'izitoast';
+import { ClipLoader } from 'react-spinners';
 import 'izitoast/dist/css/iziToast.min.css';
 
 const Categories = () => {
   const [formData, setFormData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setFormData({
@@ -50,14 +52,13 @@ const Categories = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newData = formData.data.map(({ product_name, price }) => ({ product_name, price }));
-
     const payload = {
       ...formData,
       slug: generateSlug(formData.name),
       data: newData
     };
-
     try {
+      setLoading(true)
       const response = await axios.post('https://api.storenana.my.id/products/upload-data', payload);
       console.log('Upload successful:', response.data);
       iziToast.success({
@@ -74,6 +75,8 @@ const Categories = () => {
         position: 'topRight',
         onClosed: () => window.location.reload(false) // Delay 5 seconds before reloading the page
       });
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -131,7 +134,7 @@ const Categories = () => {
           </div>
         ))}
         <button type="button" onClick={handleAddProduct} className="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Add Product</button>
-        <button type="submit" className="w-full px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Upload Data</button>
+        <button type="submit" className="w-full px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">{loading ? <ClipLoader color="#fff" size={20} /> : 'Upload Data'}</button>
       </form>
     </div>
   );

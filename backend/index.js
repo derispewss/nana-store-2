@@ -109,13 +109,11 @@ app.post('/upload-banner', upload.single('image'), async (req, res) => {
         const storagePath = `banners/${Date.now()}-${req.file.originalname}`;
         const bucket = admin.storage().bucket();
         const file = bucket.file(storagePath);
-
         await file.save(buffer, {
             metadata: {
                 contentType: req.file.mimetype
             }
         });
-
         const bucketName = bucket.name;
         const encodedPath = encodeURIComponent(storagePath);
         const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media`;
@@ -139,7 +137,6 @@ app.post('/upload-banner', upload.single('image'), async (req, res) => {
         res.status(500).send(error.message);
     }
 });
-
 
 app.get('/get-banners', async (req, res) => {
     try {

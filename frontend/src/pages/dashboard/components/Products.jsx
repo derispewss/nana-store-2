@@ -65,7 +65,7 @@ const Products = ({ data }) => {
     const handleDeleteProduct = async (slug, product_name) => {
         const result = await Swal.fire({
             title: 'Are you sure?',
-            text: `Are you sure you want to delete ${product_name}?`,
+            text: `Are you sure you want to delete "${product_name}" ?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
