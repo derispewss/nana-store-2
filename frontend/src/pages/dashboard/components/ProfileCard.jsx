@@ -7,7 +7,7 @@ const ProfileCard = () => {
             <div className="flex flex-col items-center">
                 <img
                     className="w-24 h-24 rounded-full shadow-lg mb-4"
-                    src={'https://via.placeholder.com/150'}
+                    src={'https://firebasestorage.googleapis.com/v0/b/nana-store-c5456.appspot.com/o/images%2Flogonana.jpeg?alt=media'}
                     alt="User Profile"/>
                 <h2 className="text-2xl font-semibold mb-2">Nana Store</h2>
                 <p className="text-gray-600 mb-4">{user}</p>
