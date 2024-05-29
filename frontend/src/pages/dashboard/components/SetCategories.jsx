@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import izitoast from 'izitoast';
+import Swal from 'sweetalert2';
 
 const SetCategories = ({ data }) => {
     const [selectedSlug, setSelectedSlug] = useState('');
@@ -20,7 +20,6 @@ const SetCategories = ({ data }) => {
                 console.error('Error fetching content:', error);
             }
         };
-
         if (selectedSlug) {
             fetchContent();
         }
@@ -37,21 +36,35 @@ const SetCategories = ({ data }) => {
 
     const handleSave = async () => {
         try {
-            const response = await axios.put('https://api.storenana.my.id/products/update-category', editedContent);
-            if (response.data.success) {
-                setContent(editedContent);
-                setEditMode(false);
-                izitoast.success({
-                    title: 'Success',
-                    message: 'Content saved successfully!',
-                });
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: 'You are about to save changes.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, save it!'
+            });
+
+            if (result.isConfirmed) {
+                const response = await axios.put('https://api.storenana.my.id/products/update-category', editedContent);
+                if (response.data.success) {
+                    setContent(editedContent);
+                    setEditMode(false);
+                    Swal.fire(
+                        'Saved!',
+                        'Content saved successfully.',
+                        'success'
+                    );
+                }
             }
         } catch (error) {
             console.error('Error saving content:', error);
-            izitoast.error({
-                title: 'Error',
-                message: 'Failed to save content.',
-            });
+            Swal.fire(
+                'Error!',
+                'Failed to save content.',
+                'error'
+            );
         }
     };
 
@@ -62,23 +75,36 @@ const SetCategories = ({ data }) => {
 
     const handleDelete = async () => {
         try {
-            const response = await axios.delete('https://api.storenana.my.id/products/delete-category', {
-                data: { slug: selectedSlug }
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: 'You are about to delete this content.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
             });
-            if (response.data.success) {
-                setContent(null);
-                setSelectedSlug('');
-                izitoast.success({
-                    title: 'Success',
-                    message: 'Content deleted successfully!',
+            if (result.isConfirmed) {
+                const response = await axios.delete('https://api.storenana.my.id/products/delete-category', {
+                    data: { slug: selectedSlug }
                 });
+                if (response.data.success) {
+                    setContent(null);
+                    setSelectedSlug('');
+                    Swal.fire(
+                        'Deleted!',
+                        'Content deleted successfully.',
+                        'success'
+                    );
+                }
             }
         } catch (error) {
             console.error('Error deleting content:', error);
-            izitoast.error({
-                title: 'Error',
-                message: 'Failed to delete content.',
-            });
+            Swal.fire(
+                'Error!',
+                'Failed to delete content.',
+                'error'
+            );
         }
     };
 
@@ -119,17 +145,19 @@ const SetCategories = ({ data }) => {
                     ...prevState,
                     logo: updatedImageUrl
                 }));
-                izitoast.success({
-                    title: 'Success',
-                    message: 'Image uploaded successfully!',
-                });
+                Swal.fire(
+                    'Success!',
+                    'Image uploaded successfully.',
+                    'success'
+                );
             }
         } catch (error) {
             console.error('Error uploading image:', error);
-            izitoast.error({
-                title: 'Error',
-                message: 'Failed to upload image.',
-            });
+            Swal.fire(
+                'Error!',
+                'Failed to upload image.',
+                'error'
+            );
         }
     };
 
@@ -194,4 +222,3 @@ const SetCategories = ({ data }) => {
 };
 
 export default SetCategories;
-
