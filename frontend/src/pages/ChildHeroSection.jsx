@@ -129,6 +129,7 @@ const ChildHeroSection = ({ data }) => {
                                         <option value="Dana">Dana</option>
                                         <option value="GoPay">GoPay</option>
                                         <option value="OVO">OVO</option>
+                                        <option value="Shopee Pay">Shopee Pay</option>
                                         <option value="QRIS">QRIS</option>
                                         <option value="Transfer Bank">Transfer Bank</option>
                                     </select>
@@ -168,6 +169,7 @@ const ChildHeroSection = ({ data }) => {
                                 <option value="Dana">Dana</option>
                                 <option value="GoPay">GoPay</option>
                                 <option value="OVO">OVO</option>
+                                <option value="Shopee Pay">Shopee Pay</option>
                                 <option value="QRIS">QRIS</option>
                                 <option value="Transfer Bank">Transfer Bank</option>
                             </select>
