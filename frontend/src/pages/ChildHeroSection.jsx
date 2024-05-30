@@ -83,6 +83,7 @@ const ChildHeroSection = ({ data }) => {
                                 <option value="" disabled selected>Pilih Mau Login Via Apa ?</option>
                                 <option value="Moonton">Moonton</option>
                                 <option value="Facebook">Facebook</option>
+                                <option value="Google">Google</option>
                             </select>
                             {loginVia && (
                                 <>
