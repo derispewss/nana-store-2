@@ -37,16 +37,29 @@ const ChildHeroSection = ({ data }) => {
         return <AlertsError />;
     }
 
+    function formatRupiah(amount) {
+        if (isNaN(amount)) {
+            return "Invalid amount";
+        }
+        let number = parseFloat(amount);
+        return number.toLocaleString('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+    }
+
     const getWhatsAppLink = () => {
         const phone = data.redirect_owner;
         let valueMessage;
         let message;
         if (formOption === 'VIA ID') {
-            valueMessage = `Hallo kak. Saya berminat order. Berikut formatnya\n\nׂ➤ Nick : ${input3}\nׂ➤ Id (server) : ${input1} ( ${input2} )\nׂׂ➤ Order  : ${selectedItem?.product_name}\nׂ➤ Price : Rp ${<FormatRupiah value={selectedItem?.price}/>}\n➤ Payment : ${selectedOption}\n\n❗pastikan mengisi format dengan benar. kesalahan nick, id dan server bukan kesalahan admin.`
+            valueMessage = `Hallo kak. Saya berminat order. Berikut formatnya\n\nׂ➤ Nick : ${input3}\nׂ➤ Id (server) : ${input1} ( ${input2 || 'No Data'} )\nׂׂ➤ Order  : ${selectedItem?.product_name}\nׂ➤ Price : ${formatRupiah(selectedItem?.price)}\n➤ Payment : ${selectedOption}\n\n❗pastikan mengisi format dengan benar. kesalahan nick, id dan server bukan kesalahan admin.`
             message = encodeURIComponent(valueMessage);
             return `https://api.whatsapp.com/send?phone=${phone}&text=${message}`;
         } else if (formOption === 'VILOG') {
-            valueMessage = `Hallo kak. Saya berminat order. Berikut formatnya\n\n– Login Via : ${loginVia}\n– username/email : ${input4}\n– password : ${input5}\n– order : ${selectedItem?.product_name}\n– catatan : ${input6}\n– payment : ${selectedOption}\n\n❗pastikan mengisi dengan benar\n❗matikan v2l, agar saat pengerjaan vilog tidak perlu meminta kode\n❗di mainkan 2/3 rank/cl\n❗ini vilog bukan joki . jadi tidak dipastikan menang saat main`
+            valueMessage = `Hallo kak. Saya berminat order. Berikut formatnya\n\n– Login Via : ${loginVia}\n– username/email : ${input4}\n– password : ${input5}\n– order : ${selectedItem?.product_name}\n– price : ${formatRupiah(selectedItem?.price)}\n– catatan : ${input6}\n– payment : ${selectedOption}\n\n❗pastikan mengisi dengan benar\n❗matikan v2l, agar saat pengerjaan vilog tidak perlu meminta kode\n❗di mainkan 2/3 rank/cl\n❗ini vilog bukan joki . jadi tidak dipastikan menang saat main`
             message = encodeURIComponent(valueMessage);
             return `https://api.whatsapp.com/send?phone=${phone}&text=${message}`;
         }
@@ -193,7 +206,7 @@ const ChildHeroSection = ({ data }) => {
                         <div className="flex items-center">
                             <div className="text-gray-800">
                                 <h4 className="text-lg font-semibold">{selectedItem.product_name}</h4>
-                                <p className="text-lg">{<FormatRupiah value={selectedItem.price}/>}</p>
+                                <p className="text-lg">{formatRupiah(selectedItem.price)}</p>
                             </div>
                         </div>
                         <div className="flex items-center">
