@@ -100,7 +100,10 @@ const Categories = () => {
   };
 
   const generateSlug = (name) => {
-    return name.toLowerCase().replace(/\s+/g, '-');
+    return name
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-');
   };
 
   return (
