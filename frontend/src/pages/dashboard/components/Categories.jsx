@@ -118,6 +118,7 @@ const Categories = () => {
         <textarea name="description" value={formData ? formData.description : ''} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Description" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500" />
         <select name="category" value={formData ? formData.category : ''} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500">
           <option value="" disabled selected>Select Category</option>
+          <option value="🔥Flash Sale🔥">🔥Flash Sale🔥</option>
           <option value="Games">Games</option>
           <option value="Voucher">Voucher</option>
           <option value="Aplikasi Premium">Aplikasi Premium</option>

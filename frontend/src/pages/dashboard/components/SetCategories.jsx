@@ -193,6 +193,7 @@ const SetCategories = ({ data }) => {
                                         onChange={handleCategoryChange}
                                         className="mt-2 mr-2 bg-gray-200 py-2 block text-center w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                         <option value="" disabled selected>Select Category</option>
+                                        <option value="🔥Flash Sale🔥">🔥Flash Sale🔥</option>
                                         <option value="Games">Games</option>
                                         <option value="Voucher">Voucher</option>
                                         <option value="Aplikasi Premium">Aplikasi Premium</option>

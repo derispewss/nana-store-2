@@ -25,16 +25,23 @@ const HeroSection = () => {
     };
     
     const prioritizeCategory = (grouped) => {
-        const priorityCategory = "Games";
+        const priorityCategory = "🔥Flash Sale🔥";
+        const gamesCategory = "Games";
         const ordered = {};
+        
         if (grouped[priorityCategory]) {
             ordered[priorityCategory] = grouped[priorityCategory];
         }
+        if (grouped[gamesCategory]) {
+            ordered[gamesCategory] = grouped[gamesCategory];
+        }
+        
         for (const [key, value] of Object.entries(grouped)) {
-            if (key !== priorityCategory) {
+            if (key !== priorityCategory && key !== gamesCategory) {
                 ordered[key] = value;
             }
         }
+        
         return ordered;
     };
     
