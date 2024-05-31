@@ -69,7 +69,7 @@ const HeroSection = () => {
                                 <div key={item.id} className="rounded-lg duration-300 hover:scale-105 overflow-hidden text-center bg-gray-200 border shadow-md flex flex-col">
                                     <Link to={`/order/${item.slug}`}>
                                         <div className="overflow-hidden">
-                                            <img className='w-full h-45 object-cover rounded-t-md transition-transform duration-300 hover:scale-110' src={item.logo} alt={item.name} />
+                                            <img className='w-full h-45 object-cover rounded-t-md transition-transform duration-300 hover:scale-110' src={item.logo || 'https://placehold.co/500x500/png'} alt={item.name} />
                                         </div>
                                         <div className="md:py-4 flex-col flex justify-center items-center">
                                             <div className="text-sm md:text-sm font-semibold text-gray-800 mb-2">{item.name}</div>
