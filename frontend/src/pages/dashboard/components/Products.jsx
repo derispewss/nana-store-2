@@ -113,142 +113,161 @@ const Products = ({ data }) => {
         const [editProduct, setEditProduct] = useState(null);
 
         const handleEditChange = (e) => {
-            const { name, value } = e.target;
-            setEditProduct({ ...editProduct, [name]: name === 'statusProducts' ? value === 'true' : value });
+        const { name, value } = e.target;
+        setEditProduct({ ...editProduct, [name]: name === 'statusProducts' ? value === 'true' : value });
         };
-
+    
         const handleSave = (slug, product_name) => {
-            handleUpdateProduct(slug, editProduct);
-            setEditProduct(null);
+        handleUpdateProduct(slug, editProduct);
+        setEditProduct(null);
         };
 
         return (
-            <div className="table-wrapper overflow-x-auto">
+        <div className="table-wrapper overflow-x-auto shadow-lg rounded-lg">
             <table className="min-w-full bg-white border">
-                <thead className="bg-gray-200">
-                    <tr>
-                        <th className="w-1/3 px-4 py-2">Name</th>
-                        <th className="w-1/3 px-4 py-2">Price</th>
-                        <th className="w-1/6 px-4 py-2">Status</th>
-                        <th className="w-1/6 px-4 py-2">Actions</th>
+            <thead className="bg-gray-100">
+                <tr>
+                    <th className="px-2 py-3 text-left text-sm font-medium text-gray-700">Name</th>
+                    <th className="px-2 py-3 text-left text-sm font-medium text-gray-700">Price</th>
+                    <th className="px-2 py-3 text-center text-sm font-medium text-gray-700">Status</th>
+                    <th className="px-2 py-3 text-center text-sm font-medium text-gray-700">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {products.map((product) =>
+                product.data.map((p) => (
+                    <tr key={p.product_name} className="bg-white border-t transition hover:bg-gray-50">
+                    <td className="px-2 py-4">
+                        {editProduct?.product_name === p.product_name ? (
+                        <input
+                            name="product_name"
+                            value={editProduct.product_name}
+                            onChange={handleEditChange}
+                            className="border p-2 w-full rounded"
+                        />
+                        ) : (
+                            p.product_name
+                        )}
+                    </td>
+                    <td className="px-2 py-4">
+                        {editProduct?.product_name === p.product_name ? (
+                        <input
+                            name="price"
+                            value={editProduct.price}
+                            onChange={handleEditChange}
+                            className="border p-2 w-full rounded"
+                        />
+                        ) : (
+                        <FormatRupiah value={p.price} />
+                        )}
+                    </td>
+                    <td className="px-2 py-4 text-center">
+                        {editProduct?.product_name === p.product_name ? (
+                        <select
+                            name="statusProducts"
+                            value={editProduct.statusProducts ? 'true' : 'false'}
+                            onChange={handleEditChange}
+                            className="border p-2 w-full rounded"
+                        >
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                        ) : (
+                        p.statusProducts ? 'Active' : 'Inactive'
+                        )}
+                    </td>
+                    <td className="px-2 py-4 text-center">
+                        {editProduct?.product_name === p.product_name ? (
+                        <button
+                            onClick={() => handleSave(product.slug, p.product_name)}
+                            className="text-green-500 flex items-center justify-center"
+                        >
+                            <FaPlus className="mr-1" /> Save
+                        </button>
+                        ) : (
+                        <div className="flex justify-center space-x-2">
+                            <button
+                            onClick={() => setEditProduct(p)}
+                            className="text-blue-500 flex items-center"
+                            >
+                            <FaEdit className="mr-1" /> Edit
+                            </button>
+                            <button
+                            onClick={() => handleDeleteProduct(product.slug, p.product_name)}
+                            className="text-red-500 flex items-center"
+                            >
+                            <FaTrash className="mr-1" /> Delete
+                            </button>
+                        </div>
+                        )}
+                    </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {products.map((product) => (
-                        product.data.map((p) => (
-                            <tr key={p.product_name} className="border-t">
-                                <td className="border px-4 py-2">
-                                    {editProduct?.product_name === p.product_name ? (
-                                        <input
-                                            name="product_name"
-                                            value={editProduct.product_name}
-                                            onChange={handleEditChange}
-                                            className="border p-1 w-full"
-                                        />
-                                    ) : (
-                                        p.product_name
-                                    )}
-                                </td>
-                                <td className="border px-4 py-2">
-                                    {editProduct?.product_name === p.product_name ? (
-                                        <input
-                                            name="price"
-                                            value={editProduct.price}
-                                            onChange={handleEditChange}
-                                            className="border p-1 w-full"
-                                        />
-                                    ) : (
-                                        <FormatRupiah value={p.price} />
-                                    )}
-                                </td>
-                                <td className="border px-4 py-2 text-center">
-                                    {editProduct?.product_name === p.product_name ? (
-                                        <select
-                                            name="statusProducts"
-                                            value={editProduct.statusProducts ? 'true' : 'false'}
-                                            onChange={handleEditChange}
-                                            className="border p-1 w-full"
-                                        >
-                                            <option value="true">Active</option>
-                                            <option value="false">Inactive</option>
-                                        </select>
-                                    ) : (
-                                        p.statusProducts ? 'Active' : 'Inactive'
-                                    )}
-                                </td>
-                                <td className="border px-4 py-2 text-center">
-                                    {editProduct?.product_name === p.product_name ? (
-                                        <button onClick={() => handleSave(product.slug, p.product_name)} className="flex text-green-500">
-                                            <FaPlus className="mr-1" /> Save
-                                        </button>
-                                    ) : (
-                                        <>
-                                            <button onClick={() => setEditProduct(p)} className="flex text-blue-500 mr-2">
-                                                <FaEdit /> Edit
-                                            </button>
-                                            <button onClick={() => handleDeleteProduct(product.slug, p.product_name)} className="flex text-red-500">
-                                                <FaTrash /> Delete
-                                            </button>
-                                        </>
-                                    )}
-                                </td>
-                            </tr>
-                        ))
-                    ))}
-                </tbody>
+                ))
+                )}
+            </tbody>
             </table>
-
-            </div>
+        </div>
         );
     };
 
     return (
-        <div className="p-4">
-            <h2 className="text-2xl font-semibold mb-4">Products</h2>
-            <div className="mb-4 flex items-center">
-                <label className="block text-gray-700 text-sm font-bold mr-2" htmlFor="slugFilter">
-                    Filter Products
-                </label>
-                <select 
-                    id="slugFilter" 
-                    className="block appearance-none bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline" 
-                    value={selectedSlug} 
-                    onChange={handleFilterChange}>
-                    <option value="">All Products</option>
-                    {filterOptions.map(slug => (
-                        <option key={slug} value={slug}>
-                            {slug}
-                        </option>
-                    ))}
-                </select>
-                <button onClick={() => setShowAddForm(!showAddForm)} className="ml-2 flex bg-blue-500 text-white px-6 py-2 rounded">
-                    {showAddForm ? 'Cancel' : <><FaPlus className="mr-1" /></>}
-                </button>
-            </div>
-            {showAddForm && (
-                <div className="mb-4 flex-col items-center sm:flex-col">
-                <input
-                    type="text"
-                    placeholder="Enter product name"
-                    value={newProductName}
-                    onChange={(e) => setNewProductName(e.target.value)}
-                    className="border p-2 mr-2 mb-2"
-                />
-                <input
-                    type="text"
-                    placeholder="Enter product price"
-                    value={newProductPrice}
-                    onChange={(e) => setNewProductPrice(e.target.value)}
-                    className="border p-2 mr-2 mb-2"
-                />
-                <button onClick={handleAddProduct} className="flex bg-green-500 text-white px-6 py-2 rounded">
+        <div className="p-4 md:p-6 bg-gray-50 rounded-lg shadow-md">
+        <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-gray-800">Products</h2>
+        <div className="mb-4 md:mb-6 flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
+            <label htmlFor="slugFilter" className="text-gray-700 font-medium">
+            Filter Products
+            </label>
+            <select
+            id="slugFilter"
+            className="bg-white border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:border-blue-500 transition duration-200"
+            value={selectedSlug}
+            onChange={handleFilterChange}
+            >
+            <option value="">All Products</option>
+            {filterOptions.map((slug) => (
+                <option key={slug} value={slug}>
+                {slug}
+                </option>
+            ))}
+            </select>
+            <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200 flex items-center"
+            >
+            {showAddForm ? 'Cancel' : <FaPlus className="mr-1" />}
+            </button>
+        </div>
+        {showAddForm && (
+            <div className="mb-4 md:mb-6 bg-white p-4 rounded-lg shadow-lg space-y-4">
+            <input
+                type="text"
+                placeholder="Enter product name"
+                value={newProductName}
+                onChange={(e) => setNewProductName(e.target.value)}
+                className="w-full border p-2 rounded-lg"
+            />
+            <input
+                type="text"
+                placeholder="Enter product price"
+                value={newProductPrice}
+                onChange={(e) => setNewProductPrice(e.target.value)}
+                className="w-full border p-2 rounded-lg"
+            />
+            <button
+                onClick={handleAddProduct}
+                className="w-full bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-200 flex items-center justify-center"
+            >
                 {loading ? <ClipLoader color="#fff" size={24} /> : 'Save'}
-                </button>
+            </button>
             </div>
         )}
-        <ProductsTable products={products} />
-    </div>
-);
+        <ProductsTable
+            products={products}
+            handleUpdateProduct={handleUpdateProduct}
+            handleDeleteProduct={handleDeleteProduct}
+        />
+        </div>
+    );
 };
 
 export default Products;

@@ -4,8 +4,11 @@ const crypto = require('crypto');
 const cors =  require('cors');
 const multer = require('multer');
 const db = require('./config/supabase')
+const path = require('path')
+const fs = require('fs')
 const { firestore, admin } = require('./config/firebase')
 const { waSendOTP } = require('./config/waClient')
+const { TelegraPH } = require('./config/TelegraPH')
 
 const app = express()
 
@@ -74,26 +77,22 @@ app.post('/validate-otp', async (req, res) => {
 });
 // end authentication
 
-// Endpoint untuk mengunggah gambar ke Firebase Storage
 app.post('/upload-logo', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).send('No file uploaded');
         }
-        const buffer = req.file.buffer;
-        const storagePath = `images/${Date.now()}-${req.file.originalname}`;
-        const bucket = admin.storage().bucket();
-        const file = bucket.file(storagePath);
-        await file.save(buffer, {
-            metadata: {
-                contentType: req.file.mimetype
-            }
-        });
-        const bucketName = bucket.name;
-        const encodedPath = encodeURIComponent(storagePath);
-        const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media`;
-    
-        res.status(201).json({ imageUrl: publicUrl });
+        const tempFilePath = path.join(__dirname, 'temp', `${Date.now()}-${req.file.originalname}`);
+        // Simpan file sementara ke sistem file
+        fs.writeFileSync(tempFilePath, req.file.buffer);
+        try {
+            // Unggah file ke Telegra.ph
+            const imageUrl = await TelegraPH(tempFilePath);
+            res.status(201).json({ imageUrl: imageUrl });
+        } finally {
+            // Hapus file sementara
+            fs.unlinkSync(tempFilePath);
+        }
     } catch (error) {
         console.error('Error uploading image:', error);
         res.status(500).send(error.message);
@@ -130,7 +129,6 @@ app.post('/upload-banner', upload.single('image'), async (req, res) => {
         await firestore.collection('settings-nanastore').doc('banners').set({
             banners: banners
         });
-
         res.status(201).json({ name: `Slide ${banners.length - 1}`, imageUrl: publicUrl });
     } catch (error) {
         console.error('Error uploading image:', error);
@@ -149,7 +147,6 @@ app.get('/get-banners', async (req, res) => {
             name: `Slide ${index}`,
             imageUrl: banner.imageUrl
         }));
-
         res.status(200).json(formattedBanners);
     } catch (error) {
         console.error('Error retrieving banners:', error);
@@ -160,14 +157,17 @@ app.get('/get-banners', async (req, res) => {
 // products manage
 app.get('/products', async (req, res) => {
     try {
-        const querySnapshot = await firestore.collection('nanastore').get();
-        const data = querySnapshot.docs.map(doc => {
-            const docData = doc.data();
-            const { name, logo, description, category, slug, redirect_owner, data } = docData; 
+        const { data: products, error } = await db.from('nanastore').select('*');
+        if (error) {
+            throw error;
+        }
+        const response = products.map(product => {
+            const { name, logo, description, category, slug, redirect_owner, data } = product;
             return { name, logo, description, category, slug, redirect_owner, data };
         });
-        res.status(200).json(data);
+        res.status(200).json(response);
     } catch (error) {
+        console.error('Error fetching products:', error);
         res.status(500).send(error.message);
     }
 });
@@ -178,108 +178,148 @@ app.get('/products/filter', async (req, res) => {
         return res.status(400).send('Slug query parameter is required');
     }
     try {
-        const querySnapshot = await firestore.collection('nanastore').where('slug', '==', slug).get();
-        if (querySnapshot.empty) {
+        const { data: products, error } = await db.from('nanastore').select('*').eq('slug', slug);
+        if (error) {
+            throw error;
+        }
+        if (products.length === 0) {
             return res.status(404).send('No matching documents');
         }
-        const data = querySnapshot.docs.map(doc => {
-            const docData = doc.data();
-            const { name, logo, description, category, slug, redirect_owner, data } = docData; 
+        const response = products.map(product => {
+            const { name, logo, description, category, slug, redirect_owner, data } = product;
             return { name, logo, description, category, slug, redirect_owner, data };
         });
-        res.status(200).json(data);
+        res.status(200).json(response);
     } catch (error) {
+        console.error('Error fetching filtered products:', error);
         res.status(500).send(error.message);
     }
 });
 
-app.get('/products/:id', async (req, res) => {
-    try {
-        const docId = req.params.id;
-        const doc = await firestore.collection('nanastore').doc(docId).get();
-        if (!doc.exists) {
-            res.status(404).json({ success: false, message: "name not found" });
-        } else {
-            res.status(200).json({ id: doc.id, ...doc.data() });
-        }
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
-});
 
-app.post('/products/upload-data', async (req, res) => {
+app.post('/products/upload-data', upload.single('logo'), async (req, res) => {
     try {
-        const { name, logo, description, category, slug, redirect_owner, data, token } = req.body;
+        console.log("Received request to upload data");
+        const { name, description, category, slug, redirect_owner, data, token } = req.body;
+        // Validate the token and form fields
+        console.log("Validating token and form fields");
         const { data: responseToken } = await db.from('otp_tokens').select('*').eq('access_token', token).single();
-        if (!token || !name || !logo || !description || !category || !slug || !redirect_owner || !Array.isArray(data) || data.length === 0) {
-            return res.status(400).send('token is required');
+        if (!token || !name || !description || !category || !slug || !redirect_owner || !data) {
+            console.log("Missing required fields");
+            return res.status(400).send('All fields are required');
         }
-        if (token === responseToken.access_token) {
-            for (let item of data) {
-                if (!item.product_name || !item.price) {
-                    return res.status(400).send('Each item in data array must have product_name and price');
-                }
-            }
-            // Check if document with the same name already exists
-            const existingDoc = await firestore.collection('nanastore').doc(name).get();
-            if (existingDoc.exists) {
-                return res.status(400).json({ success: false, message: 'products already exists' });
-            }
-            // Save unique data to Firestore
-            const docRef = firestore.collection('nanastore').doc(name);
-            await docRef.set({ 
-                name,
-                logo, 
-                description, 
-                category, 
-                slug,
-                redirect_owner,
-                data: data.map(item => ({ ...item, statusProducts: true }))
-            });
-            res.status(201).json({ success: true, message: `Data uploaded successfully with id ${docRef.id}`});
-        } else {
-            res.status(400).json({ success: false, message: 'Token is invalid' })
+        if (token !== responseToken.access_token) {
+            console.log("Invalid token");
+            return res.status(400).json({ success: false, message: 'Token is invalid' });
         }
+
+        // Process the uploaded logo
+        if (!req.file) {
+            console.log("Logo is required");
+            return res.status(400).send('Logo is required');
+        }
+        const tempFilePath = path.join(__dirname, 'temp', `${Date.now()}-${req.file.originalname}`);
+        fs.writeFileSync(tempFilePath, req.file.buffer);
+        let imageUrl;
+        try {
+            console.log("Uploading logo to Telegra.ph");
+            imageUrl = await TelegraPH(tempFilePath);
+            console.log("Logo uploaded successfully to Telegra.ph:", imageUrl);
+        } finally {
+            fs.unlinkSync(tempFilePath);
+        }
+
+        // Validate product data
+        console.log("Validating product data");
+        const parsedData = JSON.parse(data);
+        if (!Array.isArray(parsedData) || parsedData.length === 0) {
+            console.log("Invalid product data");
+            return res.status(400).send('Product data is required and must be an array');
+        }
+        for (let item of parsedData) {
+            if (!item.product_name || !item.price) {
+                console.log("Missing product_name or price in product data");
+                return res.status(400).send('Each item in data array must have product_name and price');
+            }
+        }
+
+        // Check if the product already exists
+        console.log("Checking if the product already exists");
+        const existingDoc = await db.from('nanastore').select('*').eq('name', name).single();
+        if (existingDoc.data) {
+            console.log("Product already exists");
+            return res.status(400).json({ success: false, message: 'Product already exists' });
+        }
+
+        // Save the data to the database
+        console.log("Inserting data into database");
+        const insertData = {
+            name,
+            logo: imageUrl,
+            description,
+            category,
+            slug,
+            redirect_owner,
+            data: parsedData.map(item => ({ ...item, statusProducts: true }))
+        };
+        await db.from('nanastore').insert([insertData]);
+
+        console.log("Data uploaded successfully");
+        res.status(201).json({ success: true, message: 'Data uploaded successfully' });
     } catch (error) {
+        console.error('Error uploading data:', error);
         res.status(500).send(error.message);
     }
 });
 
+// Endpoint untuk menambahkan data baru
 app.post('/products/add-data', async (req, res) => {
     try {
         const { slug, newData } = req.body;
         if (!slug || !newData) return res.status(400).send('Invalid input format');
-        const querySnapshot = await firestore.collection('nanastore').where('slug', '==', slug).get();
-        if (querySnapshot.empty) return res.status(404).send('Document not found');
-        const doc = querySnapshot.docs[0];
-        let existingData = doc.data().data || [];
-        existingData.push(newData);
-        await doc.ref.update({
-            data: existingData
-        });
+        // Mengambil dokumen dengan 'slug' tertentu
+        const { data: existingDoc, error } = await db.from('nanastore').select('data').eq('slug', slug).single();
+        if (error) throw new Error(error.message);
+        // Menggabungkan data baru ke dalam array 'data' pada dokumen yang sudah ada
+        const updatedData = existingDoc.data ? [...existingDoc.data, newData] : [newData];
+        // Memperbarui dokumen dengan data baru
+        await db.from('nanastore').update({ data: updatedData }).eq('slug', slug);
         res.status(200).json({ success: true, message: 'Data added successfully' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 });
-
 app.post('/products/update-data', async (req, res) => {
     try {
         const { slug, newData } = req.body;
         if (!slug || !newData) return res.status(400).send('Invalid input format');
-        const querySnapshot = await firestore.collection('nanastore').where('slug', '==', slug).get();
-        if (querySnapshot.empty) return res.status(404).send('Product not found');
-        const doc = querySnapshot.docs[0];
-        let existingData = doc.data().data || [];
-        const updatedData = existingData.map(product => {
+
+        // Cari data terdahulu berdasarkan slug
+        const { data: existingData, error: selectError } = await db
+            .from('nanastore')
+            .select('data')
+            .eq('slug', slug)
+            .single();
+
+        if (selectError) throw new Error(selectError.message);
+        if (!existingData) return res.status(404).send('Product not found');
+
+        // Lakukan pembaruan data
+        const updatedData = existingData.data.map(product => {
             if (product.product_name === newData.product_name) {
                 return { ...product, ...newData };
             }
             return product;
         });
-        await doc.ref.update({
-            data: updatedData
-        });
+
+        // Perbarui data di tabel 'nanastore' di database
+        const { error: updateError } = await db
+            .from('nanastore')
+            .update({ data: updatedData })
+            .eq('slug', slug);
+
+        if (updateError) throw new Error(updateError.message);
+    
         res.status(200).json({ success: true, message: 'Data updated successfully' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -290,14 +330,25 @@ app.post('/products/delete-data', async (req, res) => {
     try {
         const { slug, product_name } = req.body;
         if (!slug || !product_name) return res.status(400).send('Invalid input format');
-        const querySnapshot = await firestore.collection('nanastore').where('slug', '==', slug).get();
-        if (querySnapshot.empty) return res.status(404).send('Product not found');
-        const doc = querySnapshot.docs[0];
-        let existingData = doc.data().data || [];
-        const updatedData = existingData.filter(product => product.product_name !== product_name);
-        await doc.ref.update({
-            data: updatedData
-        });
+
+        // Cari data terdahulu berdasarkan slug
+        const { data: existingData, error: selectError } = await db
+            .from('nanastore')
+            .select('data')
+            .eq('slug', slug)
+            .single();
+
+        if (selectError) throw new Error(selectError.message);
+        if (!existingData) return res.status(404).send('Product not found');
+        const updatedData = existingData.data.filter(product => product.product_name !== product_name);
+
+        const { error: updateError } = await db
+            .from('nanastore')
+            .update({ data: updatedData })
+            .eq('slug', slug);
+
+        if (updateError) throw new Error(updateError.message);
+
         res.status(200).json({ success: true, message: 'Data deleted successfully' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -308,42 +359,39 @@ app.delete('/products/delete-category', async (req, res) => {
     try {
         const { slug } = req.body;
         if (!slug) return res.status(400).send('Invalid input format');
-        const querySnapshot = await firestore.collection('nanastore').where('slug', '==', slug).get();
-        if (querySnapshot.empty) return res.status(404).send('Product not found');
-        const batch = firestore.batch();
-        querySnapshot.forEach(doc => {
-            batch.delete(doc.ref);
-        });
-        await batch.commit();
-        res.status(200).json({ success: true, message: 'Document(s) deleted successfully' });
+
+        const { data: categoryToDelete, error: selectError } = await db
+            .from('nanastore')
+            .select('slug')
+            .eq('slug', slug)
+            .single();
+
+        if (selectError) throw new Error(selectError.message);
+        if (!categoryToDelete)return res.status(404).send('Category not found');
+
+        // Hapus kategori berdasarkan slug
+        const { error: deleteError } = await db
+            .from('nanastore')
+            .delete()
+            .eq('slug', slug);
+
+        if (deleteError) throw new Error(deleteError.message);
+
+        res.status(200).json({ success: true, message: 'Category deleted successfully' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 });
 
+
+// Endpoint untuk memperbarui kategori
 app.put('/products/update-category', async (req, res) => {
     try {
         const { slug, name, logo, description, category } = req.body;
-        // Validate input
-        if (!slug || !name || !logo || !description || !category) {
-            return res.status(400).send('Invalid input format');
-        }
-        // Query Firestore for the document with the specified slug
-        const querySnapshot = await firestore.collection('nanastore').where('slug', '==', slug).get();
-        if (querySnapshot.empty) {
-            return res.status(404).send('Product not found');
-        }
-        // Get the document reference
-        const doc = querySnapshot.docs[0];
-        // Update the document fields excluding the 'redirect_owner' field and 'data' array
-        await doc.ref.update({
-            name: name,
-            logo: logo,
-            description: description,
-            category: category,
-        });
-
-        res.status(200).json({ success: true, message: 'Product updated successfully' });
+        if (!slug || !name || !logo || !description || !category) return res.status(400).send('Invalid input format');
+        const { data, error } = await db.from('nanastore').update({ name, logo, description, category }).eq('slug', slug);
+        if (error)throw new Error(error.message);
+        res.status(200).json({ success: true, message: 'Category updated successfully' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

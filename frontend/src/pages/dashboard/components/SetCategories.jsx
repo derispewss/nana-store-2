@@ -9,6 +9,7 @@ const SetCategories = ({ data }) => {
     const [editedContent, setEditedContent] = useState({});
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedImage, setSelectedImage] = useState(null);
+    const [uploadingImage, setUploadingImage] = useState(false); // New state for loading indicator
 
     useEffect(() => {
         const fetchContent = async () => {
@@ -124,13 +125,10 @@ const SetCategories = ({ data }) => {
         }));
     };
 
-    const handleImageChange = (e) => {
+    const handleImageChange = async (e) => {
         const imageFile = e.target.files[0];
         setSelectedImage(imageFile);
-        uploadImage(imageFile);
-    };
-
-    const uploadImage = async (imageFile) => {
+        setUploadingImage(true); // Show loading indicator
         try {
             const formData = new FormData();
             formData.append('image', imageFile);
@@ -158,64 +156,81 @@ const SetCategories = ({ data }) => {
                 'Failed to upload image.',
                 'error'
             );
+        } finally {
+            setUploadingImage(false); // Hide loading indicator
         }
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="max-w-lg mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-                <div className="p-4">
-                    <select
-                        value={selectedSlug}
-                        onChange={handleSlugChange}
-                        className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                    >
-                        <option value="">Select Slug</option>
-                        {data.map((item, index) => (
-                            <option key={index} value={item.slug}>{item.slug}</option>
-                        ))}
-                    </select>
-                    {content && (
-                        <div className="mt-4">
-                            <h2 className="text-xl font-bold text-center">{content.name}</h2>
-                            <img src={content.logo} alt="Product Logo" className="mt-2 rounded-md w-32 h-32 object-cover mx-auto" />
-                            <p className="mt-2 text-center">{content.description}</p>
-                            {editMode ? (
-                                <div className="mt-4">
-                                    <div className="mt-2 mb-4 flex justify-center items-center">
-                                        <label className="w-64 flex flex-col items-center px-2 py-2 bg-white text-blue-500 rounded-lg shadow-lg tracking-wide uppercase border border-blue-500 cursor-pointer hover:bg-blue-500 hover:text-white">
-                                            <span className="">Choose File</span>
-                                            <input type='file' onChange={handleImageChange} className="hidden" />
-                                        </label>
-                                    </div>
-                                    <select
-                                        value={selectedCategory}
-                                        onChange={handleCategoryChange}
-                                        className="mt-2 mr-2 bg-gray-200 py-2 block text-center w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                        <option value="" disabled selected>Select Category</option>
-                                        <option value="🔥Flash Sale🔥">🔥Flash Sale🔥</option>
-                                        <option value="Games">Games</option>
-                                        <option value="Voucher">Voucher</option>
-                                        <option value="Aplikasi Premium">Aplikasi Premium</option>
-                                        <option value="Pulsa">Pulsa</option>
-                                        <option value="Entertaiment">Entertaiment</option>
-                                        <option value="Layanan Lainya">Layanan Lainya</option>
-                                    </select>
-                                    <input type="text" name="name" placeholder='edit category name' value={editedContent.name} onChange={handleFieldChange} className="bg-gray-200 py-2 mt-2 text-center block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
-                                    <input type="text" name="description" placeholder='edit description' value={editedContent.description} onChange={handleFieldChange} className="bg-gray-200 py-2 mt-2 text-center block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
-                                    <div className="flex justify-center mt-4">
-                                        <button onClick={handleSave} className="mr-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Save</button>
-                                        <button onClick={handleCancel} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Cancel</button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="flex justify-center mt-4">
-                                    <button onClick={handleEdit} className="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit</button>
-                                    <button onClick={handleDelete} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
-                                </div>
-                            )}
+        <div className="container mx-auto p-6">
+            <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden">
+                <div className="p-6">
+                <select
+                    value={selectedSlug}
+                    onChange={handleSlugChange}
+                    className="block w-full mt-1 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                >
+                    <option value="">Select Slug</option>
+                    {data.map((item, index) => (
+                        <option key={index} value={item.slug}>{item.slug}</option>
+                    ))}
+                </select>
+                {content && (
+                    <div className="mt-6 text-center">
+                    <h2 className="text-2xl font-bold text-gray-800">{content.name}</h2>
+                    <img src={content.logo} alt="Product Logo" className="mt-4 rounded-md w-32 h-32 object-cover mx-auto shadow-md" />
+                    <p className="mt-4 text-gray-600">{content.description}</p>
+                    {editMode ? (
+                        <div className="mt-6 space-y-4">
+                        <div className="flex justify-center">
+                            <label className="w-64 flex flex-col items-center px-4 py-2 bg-blue-50 text-blue-500 rounded-lg shadow-md tracking-wide uppercase border border-blue-500 cursor-pointer hover:bg-blue-500 hover:text-white">
+                            <span className="text-base leading-normal">Choose File</span>
+                            <input type='file' onChange={handleImageChange} className="hidden" />
+                            </label>
+                        </div>
+                        <select
+                            value={selectedCategory}
+                            onChange={handleCategoryChange}
+                            className="block w-full bg-gray-200 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                        >
+                            <option value="" disabled>Select Category</option>
+                            <option value="🔥Flash Sale🔥">🔥Flash Sale🔥</option>
+                            <option value="Games">Games</option>
+                            <option value="Voucher">Voucher</option>
+                            <option value="Aplikasi Premium">Aplikasi Premium</option>
+                            <option value="Pulsa">Pulsa</option>
+                            <option value="Entertaiment">Entertaiment</option>
+                            <option value="Layanan Lainya">Layanan Lainya</option>
+                        </select>
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder='Edit category name'
+                            value={editedContent.name}
+                            onChange={handleFieldChange}
+                            className="block w-full bg-gray-200 py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                        />
+                        <input
+                            type="text"
+                            name="description"
+                            placeholder='Edit description'
+                            value={editedContent.description}
+                            onChange={handleFieldChange}
+                            className="block w-full bg-gray-200 py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                        />
+                        <div className="flex justify-around mt-4">
+                            <button onClick={handleSave} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-200">Save</button>
+                            <button onClick={handleCancel} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-200">Cancel</button>
+                            <button onClick={handleDelete} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200">Delete</button>
+                        </div>
+                        </div>
+                    ) : (
+                        <div className="mt-6 flex justify-center">
+                            <button onClick={handleEdit} className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">Edit</button>
                         </div>
                     )}
+                    </div>
+                )}
                 </div>
             </div>
         </div>
@@ -223,3 +238,4 @@ const SetCategories = ({ data }) => {
 };
 
 export default SetCategories;
+
