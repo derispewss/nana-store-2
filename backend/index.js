@@ -217,13 +217,14 @@ app.post('/products/upload-data', upload.single('logo'), async (req, res) => {
         if (!req.file) {
             return res.status(400).send('Logo is required');
         }
-        let imageUrl;
-        try {
-            console.log("Uploading logo to Telegra.ph");
-            imageUrl = await TelegraPH(req.file.buffer);
-            console.log("Logo uploaded successfully to Telegra.ph:", imageUrl);
-        } catch (error) {
-            console.error(error)
+        let logoUrl;
+        if (req.file) {
+            try {
+                logoUrl = await TelegraPH(req.file.buffer, req.file.originalname);
+            } catch (error) {
+                console.error("Error uploading logo:", error);
+                return res.status(500).send('Error uploading logo');
+            }
         }
 
         // Validate product data
@@ -252,7 +253,7 @@ app.post('/products/upload-data', upload.single('logo'), async (req, res) => {
         console.log("Inserting data into database");
         const insertData = {
             name,
-            logo: imageUrl,
+            logo: logoUrl,
             description,
             category,
             slug,
@@ -383,19 +384,19 @@ app.delete('/products/delete-category', async (req, res) => {
 app.put('/products/update-category', upload.single('image'), async (req, res) => {
     try {
         const { slug, name, description, category } = req.body;
-        
         if (!slug || !name || !description || !category) {
             return res.status(400).send('Invalid input format');
         }
 
-        let logoUrl
+        let logoUrl;
         if (req.file) {
-            const tempFilePath = path.join(__dirname, 'temp', `${Date.now()}-${req.file.originalname}`);
-            fs.writeFileSync(tempFilePath, req.file.buffer);
             try {
-                logoUrl = await TelegraPH(tempFilePath);
-            } finally {
-                fs.unlinkSync(tempFilePath);
+                console.log("Uploading logo to Telegra.ph");
+                logoUrl = await TelegraPH(req.file.buffer, req.file.originalname);
+                console.log("Logo uploaded successfully to Telegra.ph:", logoUrl);
+            } catch (error) {
+                console.error("Error uploading logo:", error);
+                return res.status(500).send('Error uploading logo');
             }
         }
 
@@ -407,6 +408,7 @@ app.put('/products/update-category', upload.single('image'), async (req, res) =>
         res.status(500).json({ success: false, message: error.message });
     }
 });
+
 
 const PORT = process.env.PORT || 3600
 app.listen(PORT, () => {
