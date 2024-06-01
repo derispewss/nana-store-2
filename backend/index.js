@@ -215,18 +215,15 @@ app.post('/products/upload-data', upload.single('logo'), async (req, res) => {
 
         // Process the uploaded logo
         if (!req.file) {
-            console.log("Logo is required");
             return res.status(400).send('Logo is required');
         }
-        const tempFilePath = path.join(__dirname, 'temp', `${Date.now()}-${req.file.originalname}`);
-        fs.writeFileSync(tempFilePath, req.file.buffer);
         let imageUrl;
         try {
             console.log("Uploading logo to Telegra.ph");
-            imageUrl = await TelegraPH(tempFilePath);
+            imageUrl = await TelegraPH(`${Date.now()}-${req.file.originalname}`);
             console.log("Logo uploaded successfully to Telegra.ph:", imageUrl);
-        } finally {
-            fs.unlinkSync(tempFilePath);
+        } catch (error) {
+            console.error(error)
         }
 
         // Validate product data
@@ -383,22 +380,32 @@ app.delete('/products/delete-category', async (req, res) => {
     }
 });
 
-
-// Endpoint untuk memperbarui kategori
-app.put('/products/update-category', async (req, res) => {
+app.put('/products/update-category', upload.single('image'), async (req, res) => {
     try {
-        const { slug, name, logo, description, category } = req.body;
-        if (!slug || !name || !logo || !description || !category) return res.status(400).send('Invalid input format');
-        const { data, error } = await db.from('nanastore').update({ name, logo, description, category }).eq('slug', slug);
-        if (error)throw new Error(error.message);
+        const { slug, name, description, category } = req.body;
+        
+        if (!slug || !name || !description || !category) {
+            return res.status(400).send('Invalid input format');
+        }
+
+        let logoUrl
+        if (req.file) {
+            const tempFilePath = path.join(__dirname, 'temp', `${Date.now()}-${req.file.originalname}`);
+            fs.writeFileSync(tempFilePath, req.file.buffer);
+            try {
+                logoUrl = await TelegraPH(tempFilePath);
+            } finally {
+                fs.unlinkSync(tempFilePath);
+            }
+        }
+
+        const { data, error } = await db.from('nanastore').update({ name, logo: logoUrl, description, category }).eq('slug', slug);
+        if (error) throw new Error(error.message);
         res.status(200).json({ success: true, message: 'Category updated successfully' });
     } catch (error) {
+        console.error('Error updating category:', error);
         res.status(500).json({ success: false, message: error.message });
     }
-});
-
-app.use((req, res, next) => {
-    res.status(404).send('Maaf, Halaman yang anda kunjungi tidak tersedia di sistem kami.');
 });
 
 const PORT = process.env.PORT || 3600
