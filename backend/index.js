@@ -220,7 +220,7 @@ app.post('/products/upload-data', upload.single('logo'), async (req, res) => {
         let imageUrl;
         try {
             console.log("Uploading logo to Telegra.ph");
-            imageUrl = await TelegraPH(req.file);
+            imageUrl = await TelegraPH(req.file.buffer);
             console.log("Logo uploaded successfully to Telegra.ph:", imageUrl);
         } catch (error) {
             console.error(error)
