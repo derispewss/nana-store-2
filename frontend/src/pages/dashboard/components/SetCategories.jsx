@@ -210,7 +210,7 @@ const SetCategories = ({ data }) => {
                                         onChange={handleFieldChange}
                                         className="block w-full bg-gray-200 py-2 px-4 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                                     />
-                                    <div className="flex justify-around mt-4">
+                                    <div className="flex flex-col gap-2 mt-4">
                                         <button onClick={handleSave} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-200">Save</button>
                                         <button onClick={handleCancel} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-200">Cancel</button>
                                         <button onClick={handleDelete} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200">Delete</button>
