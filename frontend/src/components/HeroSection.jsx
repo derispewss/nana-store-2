@@ -63,7 +63,7 @@ const HeroSection = () => {
                 {Object.entries(groupedData).length > 0 ? (
                     Object.entries(groupedData).map(([category, items]) => (
                         <div key={category} className="card rounded-md p-4 my-4">
-                            <h2 className="m-5 px-3 py-2 bg-meron border-l-4 border-l-black font-semibold text-white">{category}</h2>
+                            <h2 className="m-5 px-3 py-2 bg-gray-200 border-l-4 border-l-cokelat font-semibold">{category}</h2>
                             <section id={`category-${category.toLowerCase()}`} className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                                 {items.map((item) => (
                                 <div key={item.id} className="rounded-lg duration-300 hover:scale-105 overflow-hidden text-center bg-gray-200 border shadow-md flex flex-col">

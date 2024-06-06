@@ -38,7 +38,7 @@ app.post('/send-otp', async (req, res) => {
             const otp = generateOTP().toString();
             const hashedToken = crypto.createHash('sha256').update(otp).digest('hex');
             await db.from('otp_tokens').update({ token: hashedToken }).eq('user_login', user);
-            await waSendOTP(user, otp, hashedToken)
+            await waSendOTP(user, otp)
             .then(ress => {
                 res.status(200).json({ success: true, message: 'OTP berhasil dikirim.', hashedToken });
             })
