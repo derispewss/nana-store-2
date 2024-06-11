@@ -44,6 +44,9 @@ const Login = () => {
             setError('Failed to Send OTP. Please try again.');
         } finally {
             setLoading(false);
+            if (!error) {
+                setOtpSent(true); // Update state directly here
+            }
         }
     };
 
@@ -64,6 +67,12 @@ const Login = () => {
             setError('Failed to validate OTP. Please try again.');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleLogin = () => {
+        if (otp.trim() !== '') {
+            validateOTP(); // Call validateOTP directly if OTP is entered
         }
     };
 
@@ -95,10 +104,15 @@ const Login = () => {
                             type="text"
                             value={otp}
                             onChange={(e) => setOtp(e.target.value)}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleLogin(); // Call handleLogin when Enter is pressed
+                                }
+                            }}
                             placeholder="Enter OTP"
                             className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:border-blue-500"/>
                         <button
-                            onClick={validateOTP}
+                            onClick={handleLogin}
                             disabled={loading || otp.trim() === ''}
                             className="w-full px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 transition-colors duration-300 disabled:opacity-50 flex justify-center items-center">
                             {loading ? <ClipLoader color="#fff" size={24} /> : 'Validate OTP'}
