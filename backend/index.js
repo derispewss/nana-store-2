@@ -6,8 +6,8 @@ const multer = require('multer');
 const db = require('./config/supabase')
 const path = require('path')
 const fs = require('fs')
+const bcrypt = require('bcrypt');
 const { firestore, admin } = require('./config/firebase')
-const { waSendOTP } = require('./config/waClient')
 const { TelegraPH } = require('./config/TelegraPH')
 
 const app = express()
@@ -16,12 +16,6 @@ app.use(cors())
 app.use(express.json())
 app.use('/uploads', express.static('uploads'));
 
-function generateOTP() {
-    const min = 100000;
-    const max = 999999;
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 function generateToken(length) {
     return crypto.randomBytes(length).toString('hex');
 }
@@ -29,53 +23,29 @@ function generateToken(length) {
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage });
 
-// authentication
-app.post('/send-otp', async (req, res) => {
-    const { user } = req.body;
+// Endpoint to login
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ success: false, message: 'Email and password are required.' });
+    }
     try {
-        const { data: existingUser } = await db.from('otp_tokens').select('*').eq('user_login', user).single();
-        if (existingUser) {
-            const otp = generateOTP().toString();
-            const hashedToken = crypto.createHash('sha256').update(otp).digest('hex');
-            await db.from('otp_tokens').update({ token: hashedToken }).eq('user_login', user);
-            await waSendOTP(user, otp)
-            .then(ress => {
-                res.status(200).json({ success: true, message: 'OTP berhasil dikirim.', hashedToken });
-            })
-            .catch(err => {
-                res.status(500).json({ success: false, message: 'Gagal mengirimkan OTP melalui WhatsApp.' });
-            });
-        } else {
-            res.status(404).json({ success: false, message: 'Pengguna dengan email tersebut tidak ditemukan.' });
+        const { data: existingUser } = await db.from('auth_nana_store').select('*').eq('email', email).single();
+        if (!existingUser) {
+            return res.status(404).json({ success: false, message: 'User with the provided email does not exist.' });
         }
+        const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ success: false, message: 'Invalid password.' });
+        }
+        const accessToken = generateToken(16);
+        await db.from('auth_nana_store').update({ access_token: accessToken }).eq('email', email);
+        res.json({ success: true, message: 'Login successful.', access_token: accessToken });
     } catch (error) {
-        console.error('Gagal mengirim OTP:', error.message);
-        res.status(500).json({ success: false, message: 'Gagal mengirim OTP karena kesalahan server.' });
+        console.error('Failed to login:', error.message);
+        res.status(500).json({ success: false, message: 'Failed to login due to server error.' });
     }
 });
-
-app.post('/validate-otp', async (req, res) => {
-    const { otp, token } = req.body;
-    if (!otp || !token) return res.status(400).send("otp and token is required")
-    try {
-        const { data: tokenData } = await db.from('otp_tokens').select('*').eq('token', token).single();
-        if (!tokenData) return res.status(400).json({ success: false, message: 'Token tidak valid.' });
-        
-        const hashedToken = crypto.createHash('sha256').update(otp).digest('hex');
-        
-        if (hashedToken === tokenData.token) {
-            const tokenAuth = generateToken(16)
-            await db.from('otp_tokens').update({ access_token: tokenAuth }).eq('token', token);
-            res.json({ success: true, message: 'OTP berhasil diverifikasi.', access_token: tokenAuth });
-        } else {
-            return res.status(400).json({ success: false, message: 'OTP tidak valid.' });
-        }
-    } catch (error) {
-        console.error('Gagal memverifikasi OTP : ', error);
-        res.status(500).json({ success: false, message: 'Gagal memverifikasi OTP.' });
-    }
-});
-// end authentication
 
 app.post('/upload-logo', upload.single('image'), async (req, res) => {
     try {
@@ -196,14 +166,13 @@ app.get('/products/filter', async (req, res) => {
     }
 });
 
-
 app.post('/products/upload-data', upload.single('logo'), async (req, res) => {
     try {
         console.log("Received request to upload data");
         const { name, description, category, slug, redirect_owner, data, token } = req.body;
         // Validate the token and form fields
         console.log("Validating token and form fields");
-        const { data: responseToken } = await db.from('otp_tokens').select('*').eq('access_token', token).single();
+        const { data: responseToken } = await db.from('auth_nana_store').select('*').eq('access_token', token).single();
         if (!token || !name || !description || !category || !slug || !redirect_owner || !data) {
             console.log("Missing required fields");
             return res.status(400).send('All fields are required');
