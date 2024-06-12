@@ -24,22 +24,35 @@ const HeroSection = () => {
         }, {});
     };
     
-    const prioritizeCategory = (grouped) => {
-        const priorityCategory = "🔥Flash Sale🔥";
-        const gamesCategory = "Games";
+    const sortItemsAlphabetically = (items) => {
+        return items.sort((a, b) => a.name.localeCompare(b.name));
+    };
+    
+    const prioritizeAndSortCategories = (grouped) => {
+        const priorityCategories = ["🔥Flash Sale🔥", "Games"];
+        const bottomCategory = "Layanan Lainya";
         const ordered = {};
         
-        if (grouped[priorityCategory]) {
-            ordered[priorityCategory] = grouped[priorityCategory];
-        }
-        if (grouped[gamesCategory]) {
-            ordered[gamesCategory] = grouped[gamesCategory];
-        }
-        
-        for (const [key, value] of Object.entries(grouped)) {
-            if (key !== priorityCategory && key !== gamesCategory) {
-                ordered[key] = value;
+        // Add priority categories at the beginning
+        priorityCategories.forEach(category => {
+            if (grouped[category]) {
+                ordered[category] = sortItemsAlphabetically(grouped[category]);
+                delete grouped[category];
             }
+        });
+
+        // Sort other categories alphabetically
+        const sortedKeys = Object.keys(grouped).sort();
+        
+        sortedKeys.forEach((key) => {
+            if (key !== bottomCategory) {
+                ordered[key] = sortItemsAlphabetically(grouped[key]);
+            }
+        });
+
+        // Add the bottom category at the end
+        if (grouped[bottomCategory]) {
+            ordered[bottomCategory] = sortItemsAlphabetically(grouped[bottomCategory]);
         }
         
         return ordered;
@@ -52,7 +65,7 @@ const HeroSection = () => {
     useEffect(() => {
         if (data.length > 0) {
             const grouped = groupByCategory(data);
-            const orderedGroupedData = prioritizeCategory(grouped);
+            const orderedGroupedData = prioritizeAndSortCategories(grouped);
             setGroupedData(orderedGroupedData);
         }
     }, [data]);
