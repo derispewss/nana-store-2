@@ -7,11 +7,11 @@ const [activeNav, setActiveNav] = useState('Home');
 const [isMenuOpen, setIsMenuOpen] = useState(false);
 return (
     <div>
-        <nav className="w-full bg-yellow-950 md:bg-transparent md:px-24">
-            <div className="container bg-yellow-950 mx-auto px-4 py-4">
+        <nav className="w-full bg-blue md:bg-transparent md:px-24">
+            <div className="container bg-blue mx-auto px-4 py-4">
                 <div className="flex justify-between items-center">
                     <div className="text-white">
-                        <Link to="/" className="text-xl font-bold">Nana Store</Link>
+                        <Link to="/" className="text-xl font-bold">Fairy Shop</Link>
                     </div>
                     <div className="hidden md:flex items-center">
                         <ul className="flex space-x-4">

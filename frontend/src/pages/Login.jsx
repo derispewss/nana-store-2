@@ -52,8 +52,8 @@ const Login = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-cream text-white px-4">
-            <div className="bg-cokelat p-8 rounded-lg shadow-lg max-w-md w-full">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-skyblue text-white px-4">
+            <div className="bg-blue p-8 rounded-lg shadow-lg max-w-md w-full">
                 <h1 className="text-2xl font-semibold mb-2">Dashboard Admin</h1>
                 {error && <p className="text-red-500 mb-2">{error}</p>}
                 {successMessage && <p className="text-green-500 mb-2">{successMessage}</p>}
@@ -63,19 +63,19 @@ const Login = () => {
                         value={email}
                         onChange={handleEmailChange}
                         placeholder="Enter your email"
-                        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:border-blue-500"
+                        className="w-full px-4 py-2 rounded-lg focus:outline-none text-black focus:border-skyblue"
                     />
                     <input
                         type="password"
                         value={password}
                         onChange={handlePasswordChange}
                         placeholder="Enter your password"
-                        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:border-blue-500"
+                        className="w-full px-4 py-2 rounded-lg focus:outline-none text-black focus:border-skyblue"
                     />
                     <button
                         onClick={login}
                         disabled={loading || email.trim() === '' || password.trim() === ''}
-                        className="w-full px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 transition-colors duration-300 disabled:opacity-50 flex justify-center items-center">
+                        className="w-full px-4 py-2 rounded-lg bg-blue border hover:bg-skyblue hover:text-black transition-colors duration-300 disabled:opacity-80 flex justify-center items-center">
                         {loading ? <ClipLoader color="#fff" size={24} /> : 'Login'}
                     </button>
                 </div>

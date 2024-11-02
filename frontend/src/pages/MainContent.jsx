@@ -1,27 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
 import Footer from '../components/Footer';
-import axios from 'axios';
+import { banner, banner2 } from '../assets/images'
 import 'swiper/css';
 
 const MainContent = ({ data }) => {
-    const [images, setImages] = useState([]);
-    useEffect(() => {
-        const fetchImages = async () => {
-            try {
-                const response = await axios.get('https://api.storenana.my.id/get-banners');
-                setImages(response.data);
-            } catch (error) {
-                console.error('Gagal mendapatkan daftar gambar:', error);
-            }
-        };
-        fetchImages();
-    }, []);
+    const images = [
+        {
+            id: 1,
+            imageUrl : banner,
+        },
+        {
+            id: 2,
+            imageUrl : banner2,
+        }
+    ]
     return (
-        <div className="w-full bg-cream">
+        <div className="w-full bg-skyblue">
             <Navbar/>
             <div className="md:w-full md:px-24 px-4 mx-auto mt-10">
                 <Swiper

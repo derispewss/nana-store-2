@@ -38,7 +38,7 @@ const ProductsTable = () => {
     };
 
     return (
-        <div className="bg-cream">
+        <div className="bg-skyblue">
             <Navbar />
             <div className="min-h-screen px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">

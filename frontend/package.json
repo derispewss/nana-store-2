@@ -10,6 +10,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.6.8",
     "izitoast": "^1.4.0",
+    "lucide-react": "^0.454.0",
     "nprogress": "^0.2.0",
     "postcss": "^8.4.38",
     "postcss-cli": "^11.0.0",

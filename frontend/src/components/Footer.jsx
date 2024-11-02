@@ -28,7 +28,7 @@ const Footer = ({ data }) => {
     const groupedData = groupByCategory(validData);
 
     return (
-        <footer className="text-white bg-cokelat body-font">
+        <footer className="text-white bg-blue body-font">
             <div className="container px-5 py-24 mx-auto flex md:items-center lg:items-start md:flex-row md:flex-nowrap flex-wrap flex-col">
                 <div className="w-64 flex-shrink-0 md:mx-0 mx-auto text-center md:text-left">
                     <a className="flex title-font font-medium items-center md:justify-start justify-center text-white">

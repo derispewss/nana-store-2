@@ -66,7 +66,7 @@ const ChildHeroSection = ({ data }) => {
     };
 
     return (
-        <div className="w-full bg-cream min-h-screen flex flex-col justify-between text-white">
+        <div className="w-full bg-skyblue min-h-screen flex flex-col justify-between text-white">
             <Navbar />
             <div className="container mx-auto py-10 flex-grow">
                 <div className="flex flex-col items-center mb-8">
@@ -137,7 +137,6 @@ const ChildHeroSection = ({ data }) => {
                             )}
                         </>
                     )}
-
                     {formOption === 'VIA ID' && !isViaLogin && (
                         <>
                             <input 
@@ -202,7 +201,6 @@ const ChildHeroSection = ({ data }) => {
                     </div>
                 </div>
             </div>
-
             {selectedItem && (
                 <div ref={selectedItemRef} className="container mx-auto bg-white p-6 border-t border-gray-300 shadow-lg w-full rounded-t-lg">
                     <div className="flex items-center justify-between px-4">
@@ -222,7 +220,7 @@ const ChildHeroSection = ({ data }) => {
                                 href={getWhatsAppLink()} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700">
+                                className="px-4 py-2 bg-blue text-white rounded-md shadow hover:bg-blue-700">
                                 Pesan Sekarang
                             </a>
                         </div>

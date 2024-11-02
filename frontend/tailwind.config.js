@@ -4,8 +4,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'cokelat': '#43291c',
-        'cream': '#c2a891'
+        'blue': '#387bd4',
+        'skyblue': '#97c4fe'
       }
     },
   },

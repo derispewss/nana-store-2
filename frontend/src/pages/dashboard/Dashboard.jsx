@@ -33,13 +33,13 @@ const Dashboard = ({ data }) => {
 
 const TopBar = ({ menuOpen, setMenuOpen }) => {
     return (
-        <header className="bg-cokelat text-white flex justify-between items-center p-4">
+        <header className="bg-blue text-white flex justify-between items-center p-4">
             <div className="flex items-center space-x-4">
                 <button onClick={() => setMenuOpen(!menuOpen)} className="text-white lg:hidden">
                     <FiMenu size={24} />
                 </button>
                 <Link to="/dashboard" className="text-2xl font-semibold">
-                    Nana Store
+                    Fairy Shop
                 </Link>
             </div>
             <nav className="hidden lg:flex space-x-4">
@@ -58,7 +58,7 @@ const TopBar = ({ menuOpen, setMenuOpen }) => {
 
 const MobileMenu = () => {
     return (
-        <nav className="bg-cokelat text-white flex flex-col p-4 space-y-2 lg:hidden">
+        <nav className="bg-blue text-white flex flex-col p-4 space-y-2 lg:hidden">
             <NavLink to="/dashboard" label="Home" icon={<FiHome />} />
             <NavLink to="/dashboard/profile" label="Profile" icon={<FiUser />} />
             <NavLink to="/dashboard/category" label="category" icon={<FiTag />} />
