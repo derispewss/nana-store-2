@@ -130,7 +130,7 @@ const ProductsTable = () => {
 
 const NavLink = ({ to, label, icon }) => {
     return (
-        <Link to={to} className="flex items-center p-2 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-700">
+        <Link to={to} className="flex items-center p-2 bg-blue text-white px-2 py-1 rounded">
             <span className="mr-3">{icon}</span>
             {label}
         </Link>
