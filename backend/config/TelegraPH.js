@@ -2,18 +2,14 @@ const axios = require('axios');
 const FormData = require('form-data');
 
 async function TelegraPH(buffer, originalname) {
-    const formData = new FormData();
-    formData.append('file', buffer, {
-        filename: originalname,
-        contentType: 'image/jpeg'
-    });
+    const form = new FormData();
+    form.append('files[]', buffer, originalname);
     try {
-        const response = await axios.post('https://telegra.ph/upload', formData, {
-            headers: {
-                ...formData.getHeaders(),
-            },
-        });
-        return `https://telegra.ph${response.data[0].src}`;
+        const response = await axios.post('https://qu.ax/upload.php', form, {
+            headers: form.getHeaders(),
+        })
+        const uploadedUrl = response.data.files[0].url;
+        return uploadedUrl;
     } catch (error) {
         throw new Error('Error uploading image to Telegra.ph');
     }
